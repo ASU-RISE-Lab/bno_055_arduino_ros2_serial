@@ -4,6 +4,7 @@ from rclpy.node import Node
 from std_msgs.msg import String
 from bno_055_arduino_ros2_serial.msg import ImuData  # Custome Message with 4 float values
 import numpy as np
+import time
 
 class BNO055_DATA(Node):
 
@@ -13,6 +14,10 @@ class BNO055_DATA(Node):
         timer_period = 0.02  # seconds
         self.timer = self.create_timer(timer_period, self.timer_callback)
         self.device = serial.Serial("/dev/ttyACM0", 115200, timeout=0.5)
+
+        # while(1):
+        #     self.timer_callback()
+        #     time.sleep(0.02)
 
     def timer_callback(self):
 
@@ -39,7 +44,7 @@ class BNO055_DATA(Node):
         self.get_logger().info('Imu1:"%f" Imu2:"%f" Imu3:"%f" Imu4:"%f"' % (values.imu1, values.imu2, values.imu3, values.imu4))
 
     def send_serial(self):
-        msg = "alpha".encode()
+        msg = "1234".encode()
         self.device.write(msg)
 
     def read_serial(self):
