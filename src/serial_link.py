@@ -2,7 +2,7 @@ import rclpy
 import serial
 from rclpy.node import Node
 from std_msgs.msg import String
-from bno_055_arduino_ros2_serial.msg import ImuData
+from bno_055_arduino_ros2_serial.msg import ImuData  # Custome Message with 4 float values
 import numpy as np
 
 class BNO055_DATA(Node):
@@ -22,15 +22,15 @@ class BNO055_DATA(Node):
         msg.data = self.read_serial()
         data = msg.data.split(",")
 
-        for i in range(len(data)):
+        for i in range(len(data)):                  # To Convert any Null data to 0
             if data[i] == '' or data[i] == 'nan' :
                 data[i] = '0'
-        
-        if len(data) < 4:
+
+        if len(data) < 4:                           # To Create an array with length 4 irrespective of number of IMUs
             for i in range(len(data),4):
                 data.append('0')
 
-        values.imu1 = float(data[0])
+        values.imu1 = float(data[0])                # Type Casting
         values.imu2 = float(data[1])
         values.imu3 = float(data[2])
         values.imu4 = float(data[3])
@@ -46,7 +46,6 @@ class BNO055_DATA(Node):
         msg = String()
         msg = self.device.readline()
         msg = msg.decode('utf-8').strip()
-        #self.get_logger().info('Publishing: "%s"' % msg)
         return msg
 
 def main(args=None):
