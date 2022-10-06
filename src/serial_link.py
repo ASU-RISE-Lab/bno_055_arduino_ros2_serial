@@ -2,24 +2,41 @@ import rclpy
 import serial
 from rclpy.node import Node
 from std_msgs.msg import String
-
-
+from bno_055_arduino_ros2_serial.msg import ImuData
+import numpy as np
 
 class BNO055_DATA(Node):
 
     def __init__(self):
         super().__init__('BNO055_DATA')
-        self.publisher_ = self.create_publisher(String, 'topic', 1)
+        self.publisher_ = self.create_publisher(ImuData, 'IMU_Data', 1)
         timer_period = 0.02  # seconds
         self.timer = self.create_timer(timer_period, self.timer_callback)
         self.device = serial.Serial("/dev/ttyACM0", 115200, timeout=0.5)
 
     def timer_callback(self):
+
+        values = ImuData()
         msg = String()
         self.send_serial()
         msg.data = self.read_serial()
-        self.publisher_.publish(msg)
-        self.get_logger().info('Publishing: "%s"' % msg.data)
+        data = msg.data.split(",")
+
+        for i in range(len(data)):
+            if data[i] == '' or data[i] == 'nan' :
+                data[i] = '0'
+        
+        if len(data) < 4:
+            for i in range(len(data),4):
+                data.append('0')
+
+        values.imu1 = float(data[0])
+        values.imu2 = float(data[1])
+        values.imu3 = float(data[2])
+        values.imu4 = float(data[3])
+
+        self.publisher_.publish(values)
+        self.get_logger().info('Imu1:"%f" Imu2:"%f" Imu3:"%f" Imu4:"%f"' % (values.imu1, values.imu2, values.imu3, values.imu4))
 
     def send_serial(self):
         msg = "alpha".encode()

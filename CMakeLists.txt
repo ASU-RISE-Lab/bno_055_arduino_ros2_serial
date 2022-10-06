@@ -17,9 +17,16 @@ endif()
 
 # find dependencies
 find_package(ament_cmake REQUIRED)
+find_package(builtin_interfaces REQUIRED)
+find_package(rosidl_default_generators REQUIRED)
 # uncomment the following section in order to fill in
 # further dependencies manually.
 # find_package(<dependency> REQUIRED)
+
+rosidl_generate_interfaces(bno_055_arduino_ros2_serial
+  "msg/ImuData.msg"
+  DEPENDENCIES builtin_interfaces
+ )
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
