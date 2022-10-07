@@ -82,5 +82,5 @@ void loop(void) {
     Serial.print(angle[0]);
     Serial.print(",");
     Serial.println(angle[1]);
-  }
+  } //else Serial.println(1);
 }
