@@ -15,10 +15,6 @@ class BNO055_DATA(Node):
         self.timer = self.create_timer(timer_period, self.timer_callback)
         self.device = serial.Serial("/dev/ttyACM0", 115200, timeout=0.5)
 
-        # while(1):
-        #     self.timer_callback()
-        #     time.sleep(0.02)
-
     def timer_callback(self):
 
         values = ImuData()
@@ -51,6 +47,8 @@ class BNO055_DATA(Node):
         msg = String()
         msg = self.device.readline()
         msg = msg.decode('utf-8').strip()
+        while self.device.in_waiting > 0: # To Flush out the input buffer to avoid overflow
+            self.device.readline()
         return msg
 
 def main(args=None):
