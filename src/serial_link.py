@@ -47,7 +47,7 @@ class BNO055_DATA(Node):
         msg = String()
         msg = self.device.readline()
         msg = msg.decode('utf-8').strip()
-        while self.device.in_waiting > 0: # To Flush out the input buffer
+        while self.device.in_waiting > 0: # To Flush out the input buffer to avoid overflow
             self.device.readline()
         return msg
 
