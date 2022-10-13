@@ -3,7 +3,6 @@ import serial
 from rclpy.node import Node
 from std_msgs.msg import String
 from bno_055_arduino_ros2_serial.msg import ImuData  # Custome Message with 4 float values
-from px4_msgs.msg import VehicleMagnetometer
 import numpy as np
 import time
 
@@ -11,32 +10,13 @@ class BNO055_DATA(Node):
 
     def __init__(self):
         super().__init__('BNO055_DATA')
-
-        self.heading = 0.0
-
         self.publisher_ = self.create_publisher(ImuData, 'IMU_Data', 1)
         timer_period = 0.02  # seconds
         self.timer = self.create_timer(timer_period, self.timer_callback)
-        self.device = serial.Serial("/dev/ttyACM1", 115200, timeout=0.5)
-        self.imu_sub = self.create_subscription(VehicleMagnetometer ,"/fmu/vehicle_magnetometer/out",self.imu_callback,10)
-        self.imu_sub
-
-    def imu_callback(self,msg):
-        self.mag_x_gauss = msg.magnetometer_ga[0]
-        self.mag_y_gauss = msg.magnetometer_ga[1]
-        self.mag_z_gauss = msg.magnetometer_ga[2]
-
-        self.heading = np.arctan2(self.mag_y_gauss,self.mag_x_gauss) * 180 / np.pi
-
-        if self.heading < 0:
-            self.heading = 360 + self.heading
-        if self.heading > 360:
-            self.heading = self.heading - 360
-
-        #print("PX4:",self.heading)
+        self.device = serial.Serial("/dev/ttyACM0", 115200, timeout=0.5)
 
     def timer_callback(self):
-        
+
         values = ImuData()
         msg = String()
         self.send_serial()
@@ -56,16 +36,8 @@ class BNO055_DATA(Node):
         values.imu3 = float(data[2])
         values.imu4 = float(data[3])
 
-        print("PX4",self.heading,"IMU1:",values.imu1,"IMU2:",values.imu2)
-
-        # values.imu1 = values.imu1 - self.heading
-        # values.imu2 = values.imu2 - self.heading
-        # values.imu3 = values.imu3 - self.heading
-        # values.imu4 = values.imu4 - self.heading
-
         self.publisher_.publish(values)
-
-        # self.get_logger().info('Imu1:"%f" Imu2:"%f" Imu3:"%f" Imu4:"%f"' % (values.imu1, values.imu2, values.imu3, values.imu4))
+        self.get_logger().info('Imu1:"%f" Imu2:"%f" Imu3:"%f" Imu4:"%f"' % (values.imu1, values.imu2, values.imu3, values.imu4))
 
     def send_serial(self):
         msg = "1234".encode()
