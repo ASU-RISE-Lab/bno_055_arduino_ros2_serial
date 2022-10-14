@@ -63,11 +63,15 @@ void loop(void) {
   }
 
   //angle[0] = euler1.x() - cal[0];
+  angle[0] = euler1.x();
+
+  /*
   angle[0] = atan2(euler1.y(),euler1.x()) * 180/3.14;
   if (angle[0] < 0)
     {angle[0] = angle[0] + 360;}
   if (angle[0] > 360)
     {angle[0]= angle[0] - 360;}
+  */
   
   TCA9548A(1);
   //imu::Vector<3> euler2 = bno2.getVector(Adafruit_BNO055::VECTOR_EULER);
@@ -82,12 +86,17 @@ void loop(void) {
 
   
   //angle[1] = euler2.x() - cal[1];
+
+  angle[1] = euler2.x();
+
+  /*
   angle[1] = atan2(euler2.y(),euler2.x()) * 180/3.14;
   if (angle[1] < 0)
     {angle[1] = angle[1] + 360;}
   if (angle[1] > 360)
     {angle[1]= angle[1] - 360;}
-
+  */
+  
   if (Serial.available() > 0){
     while (Serial.available() > 0){
       Serial.read();

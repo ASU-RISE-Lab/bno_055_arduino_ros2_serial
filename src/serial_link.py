@@ -17,7 +17,7 @@ class BNO055_DATA(Node):
         self.publisher_ = self.create_publisher(ImuData, 'IMU_Data', 1)
         timer_period = 0.02  # seconds
         self.timer = self.create_timer(timer_period, self.timer_callback)
-        self.device = serial.Serial("/dev/ttyACM1", 115200, timeout=0.5)
+        self.device = serial.Serial("/dev/ttyACM0", 115200, timeout=0.5)
         self.imu_sub = self.create_subscription(VehicleMagnetometer ,"/fmu/vehicle_magnetometer/out",self.imu_callback,10)
         self.imu_sub
 
