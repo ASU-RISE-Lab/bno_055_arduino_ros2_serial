@@ -10,7 +10,7 @@
 Adafruit_BNO055 bno1 = Adafruit_BNO055(55, BNO055_ADDR);
 Adafruit_BNO055 bno2 = Adafruit_BNO055(55, BNO055_ADDR);
 
-float angle[2] = {0, 0}; // {IMU 1, IMU 2}
+float arm_angle[2] = {0, 0}; // {IMU 1, IMU 2}
 float cal[2] = {0, 0}; // {IMU 1, IMU 2}
 bool cal_state[2] = {false, false}; // {IMU 1, IMU 2}
 float start_time = 0; // {current time, start time}
@@ -52,8 +52,8 @@ void setup(void) {
 void loop(void) {
   
   TCA9548A(0);
-  //imu::Vector<3> euler1 = bno1.getVector(Adafruit_BNO055::VECTOR_EULER);
-  imu::Vector<3> euler1 = bno1.getVector(Adafruit_BNO055::VECTOR_MAGNETOMETER);
+  imu::Vector<3> euler1 = bno1.getVector(Adafruit_BNO055::VECTOR_EULER);
+  //imu::Vector<3> euler1 = bno1.getVector(Adafruit_BNO055::VECTOR_MAGNETOMETER);
 
   if ((millis() - start_time) > 2000) {
     if (cal_state[0] == false){
@@ -63,7 +63,7 @@ void loop(void) {
   }
 
   //angle[0] = euler1.x() - cal[0];
-  angle[0] = euler1.x();
+  arm_angle[0] = euler1.x();
 
   /*
   angle[0] = atan2(euler1.y(),euler1.x()) * 180/3.14;
@@ -74,8 +74,8 @@ void loop(void) {
   */
   
   TCA9548A(1);
-  //imu::Vector<3> euler2 = bno2.getVector(Adafruit_BNO055::VECTOR_EULER);
-  imu::Vector<3> euler2 = bno2.getVector(Adafruit_BNO055::VECTOR_MAGNETOMETER);
+  imu::Vector<3> euler2 = bno2.getVector(Adafruit_BNO055::VECTOR_EULER);
+  //imu::Vector<3> euler2 = bno2.getVector(Adafruit_BNO055::VECTOR_MAGNETOMETER);
 
   if ((millis() - start_time) > 2000) {
     if (cal_state[1] == false) {
@@ -84,11 +84,8 @@ void loop(void) {
     }
   }
 
-  
-  //angle[1] = euler2.x() - cal[1];
-
-  angle[1] = euler2.x();
-
+  arm_angle[1] = euler2.x() - cal[1];
+  //Serial.println(arm_angle[1]);
   /*
   angle[1] = atan2(euler2.y(),euler2.x()) * 180/3.14;
   if (angle[1] < 0)
@@ -101,8 +98,8 @@ void loop(void) {
     while (Serial.available() > 0){
       Serial.read();
     }
-    Serial.print(angle[0]);
+    Serial.print(arm_angle[0]);
     Serial.print(",");
-    Serial.println(angle[1]);
+    Serial.println(arm_angle[1]);
   } //else Serial.println(1);
 }
