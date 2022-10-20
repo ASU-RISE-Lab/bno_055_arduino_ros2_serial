@@ -29,6 +29,8 @@ class BNO055_DATA(Node):
         self.q = np.zeros(4)
 
     def odom_callback(self, msg):
+
+        self.timestamp = msg.timestamp
         self.x = msg.x
         self.y = msg.y
         self.z = msg.z
@@ -85,13 +87,13 @@ class BNO055_DATA(Node):
 
             values.imu1 = self.arm1_delta = imu1 - (self.actual_yaw)
             values.imu2 = self.arm2_delta = imu2 - (self.actual_yaw)
-
+            values.timestamp = self.timestamp
 
             #print(self.actual_yaw)
             #print("Arm1-raw: ",im1_value, "Arm1_cal", values.imu1, "Arm1-diff: ", self.arm1_delta)
-            #print("Arm1-dx: ", self.arm1_delta, "Arm2-dx: ", self.arm2_delta)
+            print("Arm1-dx: ", self.arm1_delta, "Arm2-dx: ", self.arm2_delta)
 
-            print("PX4",self.heading,"IMU1:",values.imu1,"IMU2:",values.imu2)
+            #print("PX4",self.heading,"IMU1:",values.imu1,"IMU2:",values.imu2)
 
             # values.imu1 = values.imu1 - self.heading
             # values.imu2 = values.imu2 - self.heading
