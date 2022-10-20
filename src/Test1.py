@@ -23,7 +23,7 @@ class BNO055_DATA(Node):
         self.publisher_ = self.create_publisher(ImuData, 'IMU_Data', 1)
         timer_period = .02 # seconds
         self.timer = self.create_timer(timer_period, self.timer_callback)
-        self.device = serial.Serial("/dev/ttyACM0", 115200, timeout=0.5)
+        self.device = serial.Serial("/dev/ttyUSB0", 115200, timeout=0.5)
         self.odom_sub = self.create_subscription(VehicleOdometry ,"/fmu/vehicle_odometry/out",self.odom_callback,10)
 
         self.q = np.zeros(4)
@@ -57,52 +57,50 @@ class BNO055_DATA(Node):
         msg.data = self.read_serial()
         data = msg.data.split(",")
 
-        print(data)
+        if (len(data) != 2 ):
+            pass
+        else:
+            for i in range(len(data)):                  # To Convert any Null data to 0
+                if data[i] == '' or data[i] == 'nan' :
+                    data[i] = '0'
 
-        for i in range(len(data)):                  # To Convert any Null data to 0
-            if data[i] == '' or data[i] == 'nan' :
-                data[i] = '0'
+            if len(data) < 4:                           # To Create an array with length 4 irrespective of number of IMUs
+                for i in range(len(data),4):
+                    data.append('0')
 
-        if len(data) < 4:                           # To Create an array with length 4 irrespective of number of IMUs
-            for i in range(len(data),4):
-                data.append('0')
-
-        values.imu1 = float(data[0])                # Type Casting
-        values.imu2 = float(data[1])
-        values.imu3 = float(data[2])
-        values.imu4 = float(data[3])
-        
-        # im1_value = values.imu1
-
-        # if(abs(values.imu1) > 180.0):
-        #     values.imu1 = values.imu1 - values.imu1/abs(values.imu1)*360
-
-        # im2_value = values.imu2
-
-        # if(abs(values.imu2) > 180.0):
-        #     values.imu2 = values.imu2 - values.imu2/abs(values.imu2)*360
-
-        # values.imu1 = values.imu1 - 45.0
-        # values.imu2 = values.imu2 + 45.0
-
-        # self.arm1_delta = values.imu1 - (self.actual_yaw)
-        # self.arm2_delta = values.imu2 - (self.actual_yaw)
+            imu1 = round(float(data[0]),4)               # Type Casting
+            imu2 = round(float(data[1]),4)
+            imu3 = round(float(data[2]),4)
+            imu4 = round(float(data[3]),4)
+            
+            if(abs(imu1) > 180.0):
+                imu1 = imu1 - imu1/abs(imu1)*360
 
 
-        # #print(self.actual_yaw)
-        # #print("Arm1-raw: ",im1_value, "Arm1_cal", values.imu1, "Arm1-diff: ", self.arm1_delta)
-        # print("Arm1-dx: ", self.arm1_delta, "Arm2-dx: ", self.arm2_delta)
+            if(abs(imu2) > 180.0):
+                imu2 = imu2 - imu2/abs(imu2)*360
 
-        # #print("PX4",self.heading,"IMU1:",values.imu1,"IMU2:",values.imu2)
+            imu1 = imu1 - 45.0
+            imu2 = imu2 + 45.0
 
-        # # values.imu1 = values.imu1 - self.heading
-        # # values.imu2 = values.imu2 - self.heading
-        # # values.imu3 = values.imu3 - self.heading
-        # # values.imu4 = values.imu4 - self.heading
+            values.imu1 = self.arm1_delta = imu1 - (self.actual_yaw)
+            values.imu2 = self.arm2_delta = imu2 - (self.actual_yaw)
 
-        # self.publisher_.publish(values)
 
-        # # self.get_logger().info('Imu1:"%f" Imu2:"%f" Imu3:"%f" Imu4:"%f"' % (values.imu1, values.imu2, values.imu3, values.imu4))
+            #print(self.actual_yaw)
+            #print("Arm1-raw: ",im1_value, "Arm1_cal", values.imu1, "Arm1-diff: ", self.arm1_delta)
+            #print("Arm1-dx: ", self.arm1_delta, "Arm2-dx: ", self.arm2_delta)
+
+            print("PX4",self.heading,"IMU1:",values.imu1,"IMU2:",values.imu2)
+
+            # values.imu1 = values.imu1 - self.heading
+            # values.imu2 = values.imu2 - self.heading
+            # values.imu3 = values.imu3 - self.heading
+            # values.imu4 = values.imu4 - self.heading
+
+            self.publisher_.publish(values)
+
+            # self.get_logger().info('Imu1:"%f" Imu2:"%f" Imu3:"%f" Imu4:"%f"' % (values.imu1, values.imu2, values.imu3, values.imu4))
 
     def send_serial(self):
         msg = "1234".encode()
