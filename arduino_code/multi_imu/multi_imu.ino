@@ -5,10 +5,11 @@
 #include <math.h>
 
 #define TCA_ADDR 0x70
-#define BNO055_ADDR 0x28 
+#define BNO055_ADDR1 0x28
+#define BNO055_ADDR2 0x29
 
-Adafruit_BNO055 bno1 = Adafruit_BNO055(55, BNO055_ADDR);
-Adafruit_BNO055 bno2 = Adafruit_BNO055(55, BNO055_ADDR);
+Adafruit_BNO055 bno1 = Adafruit_BNO055(55, BNO055_ADDR1);
+Adafruit_BNO055 bno2 = Adafruit_BNO055(55, BNO055_ADDR2);
 
 float arm_angle[2] = {0, 0}; // {IMU 1, IMU 2}
 float cal[2] = {0, 0}; // {IMU 1, IMU 2}
@@ -16,11 +17,11 @@ bool cal_state[2] = {false, false}; // {IMU 1, IMU 2}
 float start_time = 0; // {current time, start time}
 
 // Select I2C BUS
-void TCA9548A(uint8_t bus) {
-  Wire.beginTransmission(TCA_ADDR);  // TCA9548A address
-  Wire.write(1 << bus);          // send byte to select bus
-  Wire.endTransmission();
-}
+//void TCA9548A(uint8_t bus) {
+//  Wire.beginTransmission(TCA_ADDR);  // TCA9548A address
+//  Wire.write(1 << bus);          // send byte to select bus
+//  Wire.endTransmission();
+//}
 
 void setup(void) {
   Serial.begin(115200);
@@ -29,7 +30,7 @@ void setup(void) {
   Wire.begin();
   
   /* Initialise the sensor */
-  TCA9548A(0);
+//  TCA9548A(0);
   if(!bno1.begin())
   {
     /* There was a problem detecting the BNO055 ... check your connections */
@@ -38,7 +39,7 @@ void setup(void) {
   }
   bno1.setExtCrystalUse(true);
   
-  TCA9548A(1);
+//  TCA9548A(1);
   if(!bno2.begin())
   {
     /* There was a problem detecting the BNO055 ... check your connections */
@@ -51,7 +52,7 @@ void setup(void) {
 
 void loop(void) {
   
-  TCA9548A(0);
+//  TCA9548A(0);
   imu::Vector<3> euler1 = bno1.getVector(Adafruit_BNO055::VECTOR_EULER);
   //imu::Vector<3> euler1 = bno1.getVector(Adafruit_BNO055::VECTOR_MAGNETOMETER);
 
@@ -73,7 +74,7 @@ void loop(void) {
     {angle[0]= angle[0] - 360;}
   */
   
-  TCA9548A(1);
+//  TCA9548A(1);
   imu::Vector<3> euler2 = bno2.getVector(Adafruit_BNO055::VECTOR_EULER);
   //imu::Vector<3> euler2 = bno2.getVector(Adafruit_BNO055::VECTOR_MAGNETOMETER);
 
@@ -85,7 +86,7 @@ void loop(void) {
   }
 
   arm_angle[1] = euler2.x() - cal[1];
-  //Serial.println(arm_angle[1]);
+  // Serial.println(arm_angle[1]);
   /*
   angle[1] = atan2(euler2.y(),euler2.x()) * 180/3.14;
   if (angle[1] < 0)
