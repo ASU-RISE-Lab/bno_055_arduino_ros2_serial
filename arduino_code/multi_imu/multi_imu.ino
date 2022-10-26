@@ -64,7 +64,7 @@ void loop(void) {
   }
 
   //angle[0] = euler1.x() - cal[0];
-  arm_angle[0] = euler1.x();
+  arm_angle[0] = euler1.x() - cal[0];
 
   /*
   angle[0] = atan2(euler1.y(),euler1.x()) * 180/3.14;

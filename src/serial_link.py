@@ -84,10 +84,12 @@ class BNO055_DATA(Node):
 
             imu1 = imu1 - 45.0
             imu2 = imu2 + 45.0
+            
+            #self.actual_yaw = 0.0
 
             values.imu1 = self.arm1_delta = imu1 - (self.actual_yaw)
             values.imu2 = self.arm2_delta = imu2 - (self.actual_yaw)
-            values.timestamp = self.timestamp
+            values.timestamp = self.timestamp #= 0
 
             #print(self.actual_yaw)
             #print("Arm1-raw: ",im1_value, "Arm1_cal", values.imu1, "Arm1-diff: ", self.arm1_delta)
