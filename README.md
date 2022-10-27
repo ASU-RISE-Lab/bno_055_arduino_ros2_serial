@@ -21,7 +21,11 @@ The node will publish the IMU data to the topic: /IMU_Data.
 
 The custom message type can be found in the [ImuData.msg](https://github.com/ASU-RISE-Lab/bno_055_arduino_ros2_serial/blob/main/msg/ImuData.msg) file.
 
-As of now the node is configured to publish the data from 4 IMUs if present. Else it will publish data only from the available IMUs. 
+Even though the Node is written for 4 IMUs, the Arduino code is written for 2 IMUs. So the Arduino code needs to be modified to work with 4 IMUs. 
+
+<!-- Need to add wiring diagram -->
+
+
 
 
 
